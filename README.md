@@ -1,7 +1,6 @@
 ## Домашнее задание JS
 
-Добро пожаловать на ~~77-е глодные игры~~ квеcт **Dungeons of Doom**.
-Ссылка на gh-pages: [Dungeon](http://artemluchin.github.io/ya-js-quest/)
+Добро пожаловать на ~~77-е глодные игры~~ квеcт [Dungeon of Doom](http://artemluchin.github.io/ya-js-quest/).
 
 Сначала я опишу задачу на каждый уровень и что ожидается на этих уровнях от игроков.
 
