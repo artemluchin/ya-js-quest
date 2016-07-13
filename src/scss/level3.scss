@@ -1,0 +1,42 @@
+.door-riddle__rabbit {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 80px;
+    background: url('../img/rabbit.png') no-repeat center center;
+    background-size: contain;
+    will-change: transform;
+}
+
+.door-riddle__carrot {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+    background: url('../img/cartoon-carrot.png') no-repeat center center;
+    background-size: contain;
+    z-index: -1;
+}
+
+.door-riddle__block {
+    box-sizing: border-box;
+    position: absolute;
+    width: 60%;
+    height: 12%;
+    background-image: url('../img/stein2.png');
+    background-size: contain;
+    border: 2px solid gray;
+    will-change: transform;
+}
+
+.door-riddle__block_right {
+    right: 0px;
+}
+
+.door-riddle__block_left {
+    left: 0px;
+}
