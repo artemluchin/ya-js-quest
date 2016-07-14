@@ -83,8 +83,7 @@ function Door1(number, onUnlock) {
       
   var startPositionY = (currentWeight / maxWeight) * (maxHeight - minHeight);
   
-  // Initial positioning. Depends on currentWeight.
-  
+  // Начальное положение элементов, в зависимости от currentWeight и targetWeight
   targetPoint.style.top = (targetWeight / maxWeight) * (maxHeight - minHeight) - targetPoint.offsetHeight / 2 + 'px';
   support.style.top = (currentWeight / maxWeight) * (maxHeight - minHeight) - support.offsetHeight / 2 + 'px';
   kettlebell.style.top = support.offsetTop - kettlebell.offsetHeight + 'px';
@@ -110,10 +109,13 @@ function Door1(number, onUnlock) {
     });
   }
   
+  // Функция считает периметр между всеми pointer'ами по текущим координатам,
+  // а также по предыдущим координатам. Дальше сравниваем эти значения.
+  // Если периметр увеличился, то это 'ZoomIn', если уменьшился - 'ZoomOut'
   function recognizerZoom(e) {
     var distance = 0,
       prevDistance = 0;
-      
+    
     pointers.forEach(function(p) {
       if (p.id === e.pointerId) {
         p.x = e.pageX;
@@ -205,7 +207,7 @@ function Door2(number, onUnlock) {
   // ==== Напишите свой код для открытия третей двери здесь ====
   // Для примера дверь откроется просто по клику на неё
 
-  var initialHeight = 0;
+  var initialHeight = 0; // для отрисовки первоначального положения эл-ов
   var pointers = [];
   var carrot = this.popup.querySelector('.door-riddle__carrot');
 
@@ -217,8 +219,9 @@ function Door2(number, onUnlock) {
     this.popup.querySelector('.door-riddle__rabbit')
   ];
 
+  // исходный стиль для некоторых элементов
   blocks.forEach(function(b) { 
-    b.style.bottom = initialHeight + '%'; // just to reduce css file
+    b.style.bottom = initialHeight + '%';
     initialHeight += 14;
   });
 
@@ -229,6 +232,13 @@ function Door2(number, onUnlock) {
     r.addEventListener('pointerleave', _onBlockPointerUp.bind(this));
     r.addEventListener('pointermove', _onBlockPointerMove.bind(this));
   }.bind(this));
+  
+  
+  function getStartPosition(e) {
+    return pointers.filter(function(p) {
+      return p.id === e.pointerId;
+    });
+  }
 
   function _onBlockPointerDown(e) {
     
@@ -237,12 +247,6 @@ function Door2(number, onUnlock) {
       id: e.pointerId,
       x: e.pageX,
       y: e.clientY
-    });
-  }
-
-  function getStartPosition(e) {
-    return pointers.filter(function(p) {
-      return p.id === e.pointerId;
     });
   }
   
@@ -267,7 +271,8 @@ function Door2(number, onUnlock) {
         requestAnimationFrame(function() {
           e.target.style.transform = 'translate(-50%,' + (currentPositionY - startPositionY) + 'px)';
         });
-
+        
+        // условие прохождения уровня
         if (currentPositionY > carrot.offsetTop + carrot.offsetHeight / 2) {
           this.unlock();
         }
@@ -313,8 +318,8 @@ function Box(number, onUnlock) {
   
   var pad = this.popup.querySelector('.door-riddle__safelock-disk'),
       safelock = this.popup.querySelector('.door-riddle__safelock-disk'),
-      sweat = this.popup.querySelector('.bonus'), //bonus
-      alarm = this.popup.querySelector('.alert'); //for iOS
+      sweat = this.popup.querySelector('.bonus'), //Бонус!
+      alarm = this.popup.querySelector('.alert'); //Для тех у кого нет vibrate API
       
   var pointers = [],
       degrees = 0,
@@ -368,40 +373,45 @@ function Box(number, onUnlock) {
           prev1y = pointers[0].prevY,
           prev2y = pointers[1].prevY;
       
+      
       alpha = getAngle(p2x, p1x, p2y, p1y);
       prevAlpha = getAngle(prev2x, prev1x, prev2y, prev1y);
       
       if (alpha > prevAlpha) {
         degrees += 1;
         direction = 1; //clockwise
-        if (degrees > 360) degrees = 0; // 
+        if (degrees > 360) degrees = 0; // чтобы градусы всегда были 0-360
         safelock.style.transform = 'rotate('+degrees+'deg)';
       }
       else if (alpha < prevAlpha) {
         degrees -= 1;
         direction = -1; //contraclockwise
-        if (degrees < 0) degrees += 360; 
+        if (degrees < 0) degrees += 360; // чтобы градусы всегда были 0-360
         safelock.style.transform = 'rotate('+degrees+'deg)';
       }
-      
-      if (Math.abs(degrees - combination.numbers[0]) < 1 && combination.direction == direction) {
-        if ('navigator' in window) {
+      // если мы попали на требуемое значение комбинации и при этом шли в
+      // ПРАВИЛЬНОМ направлении
+      if (Math.abs(degrees - combination.numbers[0]) < 1 && combination.direction === direction) {
+        if ('navigator' in window) { // если поддерживается vibrate API
           window.navigator.vibrate(20);
         }
-        else {
+        else {                      // если не поддерживается
           alarm.style.opacity = 1;
           setTimeout(function() {
             alarm.style.opacity = 0;
           }, 200);
         }
         combination.numbers.shift();
-        combination.direction *= -1;
+        combination.direction *= -1; //меняем требуемое направление
       }
+      
+      // если мы попали на требуемое значение комбинации и при этом шли в
+      // НЕПРАВИЛЬНОМ направлении
       if (Math.abs(degrees - combination.numbers[0]) < 1 && combination.direction !== direction) {
         combination.numbers = [115, 322, 217, 72];
         combination.direction = 1;
       }
-      
+      // Бонус!
       if (combination.numbers.length == 1) {
         requestAnimationFrame(function() {
           sweat.style.transform = 'translateX(0)';
